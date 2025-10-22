@@ -1,7 +1,19 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Document ""{% endblock %}
+{% block title %}entity ""{% endblock %}
 {% block content %}
     <p>&larr;&nbsp;<a href="/index.php">Retourner à la liste</a></p>
     affichez le contenu d'un document de la liste
+
+    <h2>{{ entity.titre|default('Titre inconnu') }}</h2>
+    <ul>
+        <li><strong>_id :</strong> {{ entity._id|default('N/A') }}</li>
+        <li><strong>Titre :</strong> {{ entity.titre|default('N/A') }}</li>
+        <li><strong>Auteur :</strong> {{ entity.auteur is not null ? document.auteur : 'Non renseigné' }}</li>
+        <li><strong>Édition :</strong> {{ entity.edition|default('N/A') }}</li>
+        <li><strong>Langue :</strong> {{ entity.langue|default('N/A') }}</li>
+        <li><strong>Cote :</strong> {{ entity.cote|default('N/A') }}</li>
+        <li><strong>Siècle :</strong> {{ entity.siecle|default('N/A') }}</li>
+        <li><strong>ObjectId :</strong> {{ entity.objectid|default('N/A') }}</li>
+    </ul>
 {% endblock %}
