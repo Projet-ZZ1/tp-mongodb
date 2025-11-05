@@ -12,10 +12,10 @@
     </tr>
     {% for document in list %}
     <tr>
-        <td>{{ document._id }}</td>
+        <td>{{ document.objectid }}</td>
         <td>{{ document.titre }}</td>
         <td>{{ document.auteur }}</td>
-        <td><a href="get.php?id={{ document._id }}">voir</a>&nbsp;/&nbsp;<a href="edit.php?id=1">éditer</a>&nbsp;/&nbsp;<a href="delete.php?id=1">supprimer</a></td>
+        <td><a href="get.php?id={{ document.objectid }}">voir</a>&nbsp;/&nbsp;<a href="edit.php?id={{ document.objectid }}">éditer</a>&nbsp;/&nbsp;<a href="delete.php?id={{ document.objectid }}">supprimer</a></td>
     </tr>
     {% endfor %}
 </table>

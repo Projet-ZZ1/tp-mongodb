@@ -14,6 +14,7 @@ $collection = $manager->selectCollection('tp');
 if (!empty($_POST)) {
     // @todo coder l'enregistrement d'un nouveau livre en lisant le contenu de $_POST
     $document = [
+        'objectid' => (int)$_POST['objectid'] ?? null,
         'titre' => $_POST['title'] ?? null,
         'auteur' => $_POST['author'] ?? null,
         'siecle' => isset($_POST['century']) ? (int)$_POST['century'] : null,
