@@ -23,6 +23,8 @@
       <path value="$PROJECT_DIR$/www/vendor/symfony/polyfill-php80" />
       <path value="$PROJECT_DIR$/www/vendor/twig/twig" />
       <path value="$PROJECT_DIR$/www/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/www/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/www/vendor/predis/predis" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
