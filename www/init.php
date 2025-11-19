@@ -30,7 +30,7 @@ function getMongoDbManager(): Database
 }
 
 
-function getRedisClient() {
+/*function getRedisClient() {
     $host = $_ENV['REDIS_HOST'] ?? 'tpmongo-redis';
     $port = $_ENV['REDIS_PORT'] ?? 6379;
     $enable = $_ENV['REDIS_ENABLE'] ?? 'false';
@@ -49,4 +49,13 @@ function getRedisClient() {
         error_log("Erreur Redis : " . $e->getMessage());
         return null;
     }
+}*/
+function getRedisClient(): Predis\Client
+{
+    $client = new Predis\Client([
+        'scheme' => $_ENV['REDIS_SCHEME'],
+        'host'   => $_ENV['REDIS_HOST'],
+        'port'   => $_ENV['REDIS_PORT'],
+    ]);
+    return $client;
 }
