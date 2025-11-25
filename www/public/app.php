@@ -5,44 +5,65 @@ include_once '../init.php';
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use MongoDB\BSON\Regex;
 
 $twig = getTwig();
 $manager = getMongoDbManager();
 $redis = getRedisClient();
-//var_dump($redis->ping());
 
-$cacheKey = "list_items";
+// Pagination
+$perPage = 20;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$skip = ($page - 1) * $perPage;
 
-$cached = $redis->get($cacheKey);
+// Recherche
+$search = $_GET['search'] ?? '';
+$filter = [];
+if ($search) {
+    $filter = [
+        '$or' => [
+            ['titre' => new Regex($search, 'i')],
+            ['auteur' => new Regex($search, 'i')]
+        ]
+    ];
+}
+
+// Cache Redis
+$cacheKey = "list_items_page_{$page}_search_" . md5($search);
+$cached = $redis ? $redis->get($cacheKey) : null;
 
 if ($cached !== null) {
-    // Données récupérées depuis Redis
     $list = json_decode($cached, true);
-    $fromCache = true;
 } else {
-    // Données non présentes en cache → requête MongoDB
-    $collection = $manager->selectCollection('tp');
-    $cursor = $collection->find();
+    $collection = $manager->selectCollection('manuscrits');
+    $cursor = $collection->find($filter, [
+        'skip' => $skip,
+        'limit' => $perPage
+    ]);
 
     $list = [];
     foreach ($cursor as $document) {
-        $list[] = $document->getArrayCopy(); // convertit BSONDocument en array
+        $list[] = $document->getArrayCopy();
     }
-    // Mise en cache (durée : 60 secondes)
 
-    $redis->setex($cacheKey, 60, json_encode($list));
-    $fromCache = false;
+    if ($redis) {
+        $redis->setex($cacheKey, 60, json_encode($list));
+    }
 }
 
-// @todo implementez la récupération des données dans la variable $list
-// petite aide : https://github.com/VSG24/mongodb-php-examples
+// Nombre total pour pagination
+$collection = $manager->selectCollection('manuscrits');
+$totalDocuments = $collection->countDocuments($filter);
+$totalPages = ceil($totalDocuments / $perPage);
 
-// render template
+// Render Twig
 try {
-    echo $twig->render('index.html.twig', ['list' => $list]);
+    echo $twig->render('index.html.twig', [
+        'list'       => $list,
+        'page'       => $page,
+        'totalPages' => $totalPages,
+        'search'     => $search
+    ]);
 } catch (LoaderError|RuntimeError|SyntaxError $e) {
     echo $e->getMessage();
 }
-
-
-

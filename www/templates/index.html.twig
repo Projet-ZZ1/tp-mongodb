@@ -1,22 +1,43 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Liste des manuscrits{% endblock %}
+
 {% block content %}
-<h1>Liste des manuscrits de la bibliothèque du Patrimoine de Clermont Auvergne Métropole</h1>
-<table>
-    <tr>
-        <th>Référence</th>
-        <th>Titre</th>
-        <th>Auteur</th>
-        <th>Actions</th>
-    </tr>
-    {% for document in list %}
-    <tr>
-        <td>{{ document.objectid }}</td>
-        <td>{{ document.titre }}</td>
-        <td>{{ document.auteur }}</td>
-        <td><a href="get.php?id={{ document.objectid }}">voir</a>&nbsp;/&nbsp;<a href="edit.php?id={{ document.objectid }}">éditer</a>&nbsp;/&nbsp;<a href="delete.php?id={{ document.objectid }}">supprimer</a></td>
-    </tr>
-    {% endfor %}
-</table>
+    <h1>Liste des manuscrits de la bibliothèque du Patrimoine de Clermont Auvergne Métropole</h1>
+
+    <form method="get" action="/app.php">
+        <input type="text" name="search" value="{{ search|default('') }}" placeholder="Rechercher un livre...">
+        <button type="submit">Rechercher</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Référence</th>
+            <th>Titre</th>
+            <th>Auteur</th>
+            <th>Actions</th>
+        </tr>
+        {% for document in list %}
+            <tr>
+                <td>{{ document.objectid }}</td>
+                <td>{{ document.titre }}</td>
+                <td>{{ document.auteur }}</td>
+                <td>
+                    <a href="get.php?id={{ document.objectid }}">voir</a>&nbsp;/&nbsp;
+                    <a href="edit.php?objectid={{ document.objectid }}">éditer</a>&nbsp;/&nbsp;
+                    <a href="delete.php?objectid={{ document.objectid }}">supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="?page={{ page - 1 }}&search={{ search|url_encode }}">« Précédent</a>
+        {% endif %}
+        Page {{ page }} sur {{ totalPages }}
+        {% if page < totalPages %}
+            <a href="?page={{ page + 1 }}&search={{ search|url_encode }}">Suivant »</a>
+        {% endif %}
+    </div>
 {% endblock %}

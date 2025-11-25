@@ -4,7 +4,7 @@ services:
         container_name: "tpmongo-mongodb"
         image: mongo:latest
         ports:
-            - "27017:27017"
+            - "27030:27017"
         environment:
             - MONGO_INITDB_ROOT_USERNAME=zz3f3
             - MONGO_INITDB_ROOT_PASSWORD=easyma
@@ -22,11 +22,11 @@ services:
         container_name: "tpmongo-mongo-gui"
         image: ugleiton/mongo-gui
         ports:
-            - "4321:4321"
+            - "4322:4321"
         depends_on:
             -   tpmongo-mongodb
         environment:
-            - MONGO_URL=mongodb://zz3f3:easyma@tpmongo-mongodb
+            - MONGO_URL=mongodb://zz3f3:easyma@tpmongo-mongodb:27017
         networks:
             - local
     tpmongo-php:
@@ -35,7 +35,7 @@ services:
         depends_on:
             -   tpmongo-mongodb
         ports:
-           - 8080:80
+           - 8094:80
         volumes:
            - ./www:/var/www/app/
         networks:
@@ -44,7 +44,7 @@ services:
         container_name: "tpmongo-redis"
         image: redis:7.0.5
         ports:
-            - 6379:6379
+            - 6377:6379
         networks:
             - local
     tpmongo-redis-commander:
@@ -53,7 +53,7 @@ services:
         depends_on:
             -   tpmongo-redis
         ports:
-            - 8081:8081
+            - 8060:8081
         environment:
             - REDIS_HOSTS=local:tpmongo-redis:6379
         networks:
@@ -62,7 +62,7 @@ services:
         container_name: "tpmongo-influxdb"
         image: influxdb:1.8
         ports:
-            - "8086:8086"
+            - "18086:8086"
         environment:
             - INFLUXDB_DB=k6
         networks:
@@ -73,7 +73,7 @@ services:
         depends_on:
             -   tpmongo-influxdb
         ports:
-            - "3000:3000"
+            - "3003:3000"
         environment:
             - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
             - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -102,7 +102,7 @@ services:
         image: elasticsearch:8.12.2
         container_name: tpmongo-elasticsearch
         ports:
-            - "9200:9200"
+            - "9201:9200"
         environment: ['CLI_JAVA_OPTS=-Xms512m -Xmx512m','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false', 'http.cors.allow-origin=http://localhost:8180', 'http.cors.enabled=true']
         volumes:
             -   ./elasticsearch/synonyms:/usr/share/elasticsearch/config/synonyms
@@ -120,7 +120,7 @@ services:
         image: docker.elastic.co/kibana/kibana:8.12.2
         container_name: tpmongo-kibana
         ports:
-            - "5601:5601"
+            - "5605:5601"
         environment:
             ELASTICSEARCH_HOSTS: '["http://tpmongo-elasticsearch:9200"]'
             XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
@@ -130,7 +130,7 @@ services:
         image: cars10/elasticvue
         container_name: elasticvue
         ports:
-            - "8180:8080"
+            - "8280:8080"
         networks:
             - local
 networks:

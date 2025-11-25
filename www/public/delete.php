@@ -6,7 +6,8 @@ use MongoDB\BSON\ObjectId;
 
 // Connexion à MongoDB
 $manager = getMongoDbManager();
-$collection = $manager->selectCollection('tp');
+//$collection = $manager->selectCollection('tp');
+$collection = $manager->selectCollection('manuscrits'); // un seul argument : le nom de la collection
 
 $id = $_GET['id'] ?? null;
 $error = null;

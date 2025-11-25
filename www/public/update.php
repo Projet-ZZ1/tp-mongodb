@@ -1,5 +1,7 @@
 <?php
+
 include_once '../init.php';
+
 use MongoDB\BSON\ObjectId;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -7,12 +9,12 @@ use Twig\Error\SyntaxError;
 
 $twig = getTwig();
 $manager = getMongoDbManager();
-$collection = $manager->selectCollection('tp');
-
+$collection = $manager->selectCollection('manuscrits');
 $error = null;
 
 // Si formulaire soumis (POST) → mise à jour
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $id = $_POST['id'] ?? null;
     if (!$id) die("Aucun identifiant fourni.");
 
@@ -29,16 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         $collection->updateOne(['_id' => $objectId], ['$set' => $updateData]);
+
+        // Redirige vers la page de visualisation du document
         header('Location: /get.php?id=' . $id);
         exit;
 
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $error = "Erreur lors de la mise à jour : " . $e->getMessage();
     }
 }
 
 // Si page appelée en GET → récupération du document pour pré-remplir le formulaire
 else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
     $id = $_GET['id'] ?? null;
     if (!$id) $error = "Aucun identifiant fourni.";
     else {
@@ -53,14 +58,14 @@ else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $error = "Document introuvable.";
                 $entity = null;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $error = "Erreur : " . $e->getMessage();
             $entity = null;
         }
     }
 }
 
-// Affichage du formulaire
+// Affichage du formulaire avec Twig
 try {
     echo $twig->render('update.html.twig', [
         'entity' => $entity ?? null,

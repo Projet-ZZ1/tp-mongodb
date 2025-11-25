@@ -8,7 +8,9 @@ use Twig\Error\SyntaxError;
 
 $twig = getTwig();
 $manager = getMongoDbManager();
-$collection = $manager->selectCollection('tp');
+//$collection = $manager->selectCollection('tp');
+$collection = $manager->selectCollection('manuscrits'); // un seul argument : le nom de la collection
+
 $redis = getRedisClient();
 // petite aide : https://github.com/VSG24/mongodb-php-examples
 if (!empty($_POST)) {

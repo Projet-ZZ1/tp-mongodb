@@ -1,43 +1,43 @@
 <?php
+
 include_once '../init.php';
 
-use MongoDB\BSON\ObjectId;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 $twig = getTwig();
 $manager = getMongoDbManager();
-$collection = $manager->selectCollection('tp');
+$collection = $manager->selectCollection('manuscrits');
+$redis = getRedisClient();
 
-$id = $_GET['id'] ?? null;
-$entity = null;
-$error = null;
-
-if ($id === null) {
-    $error = "Aucun identifiant fourni.";
-} else {
-    try {
-        // Récupération du document par _id
-        $objectId = new ObjectId($id);
-        $document = $collection->findOne(['_id' => $objectId]);
-
-        if ($document === null) {
-            $error = "Aucun document trouvé avec cet identifiant ($id).";
-        } else {
-            $entity = json_decode(json_encode($document), true);
-            $entity['_id'] = (string) $document->_id;
-        }
-    } catch (Exception $e) {
-        $error = "Erreur : " . $e->getMessage();
-    }
+// Supprime le cache si Redis est actif
+if ($redis) {
+    $redis->del("list_items");
 }
 
+// Vérifie que l'identifiant est passé
+if (empty($_GET['objectid'])) {
+    header('Location: /index.php');
+    exit;
+}
+
+// Récupère le document à modifier par objectid
+$objectid = (int) $_GET['objectid'];
+$entity = $collection->findOne(['objectid' => $objectid]);
+
+if (!$entity) {
+    echo "Aucun document trouvé avec objectid = $objectid";
+    exit;
+}
+
+// Convertit en array et ajoute le _id en string pour le formulaire
+$entityArray = json_decode(json_encode($entity), true);
+$entityArray['_id'] = (string) $entity->_id;
+
+// Affiche le formulaire Twig
 try {
-    echo $twig->render('update.html.twig', [
-        'entity' => $entity,
-        'error' => $error
-    ]);
+    echo $twig->render('update.html.twig', ['entity' => $entityArray]);
 } catch (LoaderError|RuntimeError|SyntaxError $e) {
     echo $e->getMessage();
 }
