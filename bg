@@ -1,0 +1,1 @@
+./mongoimport --collection=tp mongodb://zz3f3:easyma@localhost:27017/tp --authenticationDatabase=admin --file=catalogue-manuscrits-bibliotheque-patrimoine.json --jsonArray
