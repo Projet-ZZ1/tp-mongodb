@@ -28,13 +28,15 @@ if ($search) {
     ];
 }
 
-// Cache Redis
+// Clé de cache unique pour cette page + recherche
 $cacheKey = "list_items_page_{$page}_search_" . md5($search);
 $cached = $redis ? $redis->get($cacheKey) : null;
 
 if ($cached !== null) {
+    // Récupération depuis Redis
     $list = json_decode($cached, true);
 } else {
+    // Récupération depuis MongoDB
     $collection = $manager->selectCollection('manuscrits');
     $cursor = $collection->find($filter, [
         'skip' => $skip,
@@ -46,6 +48,7 @@ if ($cached !== null) {
         $list[] = $document->getArrayCopy();
     }
 
+    // Sauvegarde dans Redis 60 secondes
     if ($redis) {
         $redis->setex($cacheKey, 60, json_encode($list));
     }
@@ -56,7 +59,7 @@ $collection = $manager->selectCollection('manuscrits');
 $totalDocuments = $collection->countDocuments($filter);
 $totalPages = ceil($totalDocuments / $perPage);
 
-// Render Twig
+// Rendu Twig
 try {
     echo $twig->render('index.html.twig', [
         'list'       => $list,

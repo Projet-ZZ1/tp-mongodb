@@ -50,7 +50,7 @@ function getMongoDbManager(): Database
         return null;
     }
 }*/
-function getRedisClient(): Predis\Client
+/*function getRedisClient(): Predis\Client
 {
     $client = new Predis\Client([
         'scheme' => $_ENV['REDIS_SCHEME'],
@@ -58,4 +58,27 @@ function getRedisClient(): Predis\Client
         'port'   => $_ENV['REDIS_PORT'],
     ]);
     return $client;
+}*/
+function getRedisClient(): ?Predis\Client
+{
+    // Vérifie si le cache est activé
+    $enable = $_ENV['REDIS_ENABLE'] ?? 'false';
+    if ($enable !== 'true') {
+        return null;
+    }
+
+    try {
+        $client = new Predis\Client([
+            'scheme' => $_ENV['REDIS_SCHEME'] ?? 'tcp',
+            'host'   => $_ENV['REDIS_HOST'] ?? 'localhost',
+            'port'   => $_ENV['REDIS_PORT'] ?? 6379,
+        ]);
+        // Test de la connexion
+        $client->ping();
+        return $client;
+    } catch (Exception $e) {
+        error_log("Erreur Redis : " . $e->getMessage());
+        return null;
+    }
 }
+
