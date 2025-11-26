@@ -81,4 +81,27 @@ function getRedisClient(): ?Predis\Client
         return null;
     }
 }
+use Elastic\Elasticsearch\ClientBuilder;
 
+function getElasticSearchClient()
+{
+    $host = $_ENV['ELASTIC_HOST'] ?? 'localhost';
+    $port = $_ENV['ELASTIC_PORT'] ?? 9200;
+    $scheme = $_ENV['ELASTIC_SCHEME'] ?? 'http';
+
+    $endpoint = "{$scheme}://{$host}:{$port}";
+
+    try {
+        $client = ClientBuilder::create()
+            ->setHosts([$endpoint])
+            ->build();
+
+        // test
+        $client->info();
+
+        return $client;
+
+    } catch (\Throwable $e) {
+        return null; // ne casse pas l'application si ES tombe
+    }
+}
